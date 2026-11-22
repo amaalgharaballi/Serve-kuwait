@@ -43,3 +43,7 @@ For demo mode with sample ads and no database, empty `SUPABASE_URL` and `SUPABAS
 - Out of scope on purpose: drivers and delivery, household jobs, construction, part-time or side jobs, overseas recruitment. The site and database both reject them.
 - Worker ads are `noindex` so workers' phone numbers stay out of search engines.
 - Keep it simple: no accounts, one short form, WhatsApp for contact.
+
+## Deploys
+
+GitHub Actions (`.github/workflows/deploy.yml`) deploys `main` to servekuwait.com and posts a preview link on every pull request. It needs one repository secret, `NETLIFY_AUTH_TOKEN` (a Netlify personal access token); without it the workflow skips the deploy.

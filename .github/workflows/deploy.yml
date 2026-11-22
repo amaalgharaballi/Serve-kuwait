@@ -1,0 +1,61 @@
+name: Deploy to Netlify
+
+# main -> servekuwait.com. Pull requests -> a preview link posted on the PR.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      NETLIFY_SITE_ID: 5da4e14d-210d-4b2c-b91c-df484e7abf2c
+    steps:
+      - name: Check the Netlify key is set
+        id: key
+        run: |
+          if [ -z "$NETLIFY_AUTH_TOKEN" ]; then
+            echo "NETLIFY_AUTH_TOKEN secret is not set yet, skipping deploy."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.key.outputs.ok == 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.key.outputs.ok == 'true'
+        with:
+          node-version: 20
+
+      - name: Deploy live (main)
+        if: steps.key.outputs.ok == 'true' && github.event_name == 'push'
+        run: npx -y netlify-cli@17 deploy --prod --dir public --message "${{ github.sha }}"
+
+      - name: Deploy preview (pull request)
+        id: preview
+        if: steps.key.outputs.ok == 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          npx -y netlify-cli@17 deploy --dir public --alias "pr-${{ github.event.number }}" --json > out.json
+          echo "url=$(node -p "require('./out.json').deploy_url")" >> "$GITHUB_OUTPUT"
+
+      - name: Post preview link on the PR
+        if: steps.preview.outputs.url
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              body: `Preview: ${{ steps.preview.outputs.url }}\n\nCheck it on a phone and on desktop, in English and Arabic.`
+            });
