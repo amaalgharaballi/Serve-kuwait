@@ -30,7 +30,7 @@ For demo mode with sample ads and no database, empty `SUPABASE_URL` and `SUPABAS
 
 1. Pick or open an issue. Assign yourself.
 2. Make a branch: `git checkout -b short-description`.
-3. Commit, push, open a pull request. Netlify posts a preview link on it.
+3. Commit, push, open a pull request. Cloudflare posts a preview link on it.
 4. The other person checks the preview (phone and desktop, English and Arabic) and merges. Merging deploys.
 
 **Database changes:** write the SQL as a new file in `supabase/migrations/` (e.g. `2026-11-22-add-bengali.sql`), mention it in the pull request, and apply it to Supabase when merging. Keep `supabase/schema.sql` up to date too.
