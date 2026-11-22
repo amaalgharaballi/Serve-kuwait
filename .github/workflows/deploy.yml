@@ -59,3 +59,21 @@ jobs:
               owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               body: `Preview: ${{ steps.preview.outputs.url }}\n\nCheck it on a phone and on desktop, in English and Arabic.`
             });
+
+      - name: Tell Slack
+        if: always() && github.event_name == 'push' && steps.key.outputs.ok == 'true'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          RESULT: ${{ job.status }}
+          MSG: ${{ github.event.head_commit.message }}
+          WHO: ${{ github.actor }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && { echo "No SLACK_WEBHOOK_URL secret, skipping."; exit 0; }
+          TITLE=$(printf '%s' "$MSG" | head -1)
+          if [ "$RESULT" = "success" ]; then
+            TEXT=":white_check_mark: *Live on servekuwait.com*: ${TITLE} (by ${WHO})"
+          else
+            TEXT=":x: *Deploy failed*: ${TITLE} (by ${WHO}). Site unchanged. <${RUN}|See what went wrong>"
+          fi
+          node -e 'process.stdout.write(JSON.stringify({text: process.argv[1]}))' "$TEXT" | curl -sS -X POST -H 'content-type: application/json' --data @- "$SLACK_WEBHOOK_URL"
