@@ -134,6 +134,7 @@ function renderSide() {
   // On the jobs side you post yourself as available; on the workers side you post a job opening.
   state.formKind = hiring ? "seeking" : "hiring";
   $("postBtn").textContent = t(hiring ? "postSeeking" : "postHiring");
+  $("postBtn").classList.toggle("outline", hiring); // job seekers: the jobs come first
   fillSelect($("catFilter"), CAT_KEYS, catLabel, t("allTypes"));
   $("catFilter").value = state.cat;
   $("catFilter").setAttribute("aria-label", t("fCategory"));
@@ -166,7 +167,7 @@ function render() {
     return `<li class="ad ${hiring ? "ad-hiring" : "ad-seeking"}" id="ad-${esc(a.id)}">
       <button class="head" data-id="${esc(a.id)}" aria-expanded="${open}">
         <span class="date">${esc(ago(a.created_at))}</span>
-        <span class="main"><span class="kind ${hiring ? "k-hiring" : "k-seeking"}">${esc(t(hiring ? "badgeHiring" : "badgeSeeking"))}</span> <span class="title" dir="auto">${esc(job)}</span> <span class="l2"><span class="meta">(${esc(areaLabel(a.area))})</span> <span class="tag">${esc(catLabel(a.category))}</span>${xfer ? " " + xfer : ""}${ben ? `<span class="ben ben-line">${esc(ben)}</span>` : ""}</span></span>
+        <span class="main"><span class="kind ${hiring ? "k-hiring" : "k-seeking"}">${esc(t(hiring ? "badgeHiring" : "badgeSeeking"))}</span> <span class="title" dir="auto">${esc(job)}</span> <span class="l2"><span class="meta area">${esc(areaLabel(a.area))}</span> <span class="tag">${esc(catLabel(a.category))}</span>${xfer ? " " + xfer : ""}${ben ? `<span class="ben ben-line">${esc(ben)}</span>` : ""}</span></span>
         <span class="pay">${pay}</span>
       </button>
       ${open ? `<div class="detail">
