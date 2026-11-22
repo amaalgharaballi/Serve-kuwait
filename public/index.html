@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Serve Kuwait</title>
+<meta name="description" content="Free job board for service jobs in Kuwait: kitchen, service crew, café, shop and sales, cleaning and salon. Find a job or find a worker, then talk on WhatsApp.">
+<link rel="canonical" href="https://servekuwait.com/">
+<meta property="og:url" content="https://servekuwait.com/">
+<meta property="og:title" content="Serve Kuwait: service jobs in Kuwait. Free for workers.">
+<meta property="og:description" content="Find a job or find a worker: kitchen, café, service crew, shop and sales, cleaning, salon. Free, contact on WhatsApp.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Serve Kuwait">
+<meta property="og:image" content="https://servekuwait.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="fonts/readex-pro-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/readex-pro-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preconnect" href="https://fakbryjjjoyfyhierkhf.supabase.co" crossorigin>
+<link rel="icon" type="image/svg+xml" href="assets/serve-app-icon.svg">
+<link rel="apple-touch-icon" href="assets/serve-app-icon.svg">
+<meta name="theme-color" content="#0E4C92">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header><div class="wrap">
+  <a class="logo" href="#" id="home" aria-label="Serve Kuwait"><img src="assets/dome-s-mark.svg" alt="" width="37" height="28"><span class="wm"><b id="wmA">serve</b> <span id="wmB">kuwait</span></span></a>
+  <select id="lang" aria-label="Language"></select>
+</div></header>
+
+<div class="hero" id="hero"><div class="wrap">
+  <p class="tagline" data-i18n="tagline">Service jobs in Kuwait. Free for workers.</p>
+  <div class="roles">
+    <button class="role" data-kind="hiring" id="roleJob">I'm looking for a job</button>
+    <button class="role" data-kind="seeking" id="roleWorker">I'm looking for a worker</button>
+  </div>
+</div></div>
+
+<main class="wrap">
+  <section id="browse">
+    <div class="context">
+      <p id="intro">Jobs posted by businesses in Kuwait.</p>
+      <button class="primary" id="postBtn">Post that I'm looking for work</button>
+    </div>
+    <div class="filters">
+      <div class="row2">
+        <select id="catFilter"></select>
+        <input id="q" type="search">
+        <button id="clear">Clear</button>
+      </div>
+    </div>
+    <p class="notice" id="notice" role="status" hidden></p>
+    <div class="count" id="count">&nbsp;</div>
+    <ul class="ads" id="list"><li class="loading" aria-busy="true"></li></ul>
+    <p class="note" id="demoNote" hidden></p>
+  </section>
+
+  <section id="post" hidden>
+    <form id="form" novalidate>
+      <h1 id="fTitle"></h1>
+      <p class="sub" data-i18n="formIntro"></p>
+      <label><span data-i18n="fCategory"></span><select name="category" required></select></label>
+      <label id="jobSelRow"><span data-i18n="fJob"></span><select name="job_title" required disabled></select></label>
+      <label id="jobOtherRow" hidden><span data-i18n="fJobOther"></span><input name="job_other" maxlength="40" autocomplete="off"></label>
+      <label class="h-only"><span><span data-i18n="fSalaryH"></span> <small data-i18n="fSalaryHint"></small></span><input name="salary_h" type="number" inputmode="numeric" min="0" max="5000"></label>
+      <fieldset class="h-only ticks"><legend data-i18n="fProvided"></legend><div id="benefitBoxes"></div></fieldset>
+      <fieldset class="s-only radios"><legend data-i18n="fTransfer"></legend><div id="transferRadios"></div></fieldset>
+      <label class="s-only"><span><span data-i18n="fResidency"></span> <small data-i18n="fResidencyHint"></small></span><input name="residency_title" maxlength="60" autocomplete="off"></label>
+      <label class="s-only"><span><span data-i18n="fSalaryS"></span> <small data-i18n="fSalaryHint"></small></span><input name="salary_s" type="number" inputmode="numeric" min="0" max="5000"></label>
+      <label><span id="lArea"></span><select name="area" required></select></label>
+      <label><span><span id="lDetails"></span> <small id="hDetails"></small></span><textarea name="description" maxlength="800" required></textarea></label>
+      <label><span id="lName"></span><input name="poster_name" maxlength="60" required></label>
+      <label class="s-only"><span data-i18n="fAge"></span><input name="age" type="number" inputmode="numeric" min="18" max="75"></label>
+      <label><span><span data-i18n="fWhatsapp"></span> <small data-i18n="fWhatsappHint"></small></span><input name="whatsapp" inputmode="tel" placeholder="9xxxxxxx" required></label>
+      <div id="checksHiring" class="h-only">
+        <label class="check"><input type="checkbox" name="isBusiness"><span data-i18n="cBusiness"></span></label>
+        <label class="check" style="margin-top:10px"><input type="checkbox" name="noFees"><span data-i18n="cNoFees"></span></label>
+      </div>
+      <div id="checksSeeking" class="s-only">
+        <label class="check"><input type="checkbox" name="inKuwait"><span data-i18n="cInKuwait"></span></label>
+      </div>
+      <p class="err" id="err" role="alert"></p>
+      <div class="acts"><button class="primary" type="submit" id="submitBtn" data-i18n="publish"></button><button type="button" id="cancel" data-i18n="cancel"></button></div>
+    </form>
+    <div class="ok" id="verify" hidden>
+      <h2 data-i18n="verifyTitle"></h2>
+      <p id="verifyText"></p>
+      <div class="acts"><a class="btn wa" id="verifyBtn" target="_blank" rel="noopener" data-i18n="verifyBtn"></a></div>
+      <p class="waiting" id="verifyWaiting" role="status" data-i18n="verifyWaiting"></p>
+      <p class="small" id="verifyExpire"></p>
+      <button class="link demo" id="demoVerify" hidden data-i18n="demoVerify"></button>
+    </div>
+    <div class="ok" id="done" hidden>
+      <h2 data-i18n="doneTitle"></h2>
+      <p style="margin:0 0 14px" id="doneText"></p>
+      <div class="keep">
+        <h3 data-i18n="linkTitle"></h3>
+        <p data-i18n="linkText"></p>
+        <input id="removeUrl" readonly dir="ltr" aria-label="Private link">
+        <div class="acts"><a class="btn wa" id="sendToMe" target="_blank" rel="noopener" data-i18n="sendToMe"></a><button type="button" id="copyLink" data-i18n="copyLink"></button></div>
+      </div>
+      <div class="acts"><button class="primary" id="viewAd" data-i18n="viewAd"></button><button id="back" data-i18n="backToList"></button></div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <p class="trust" data-i18n="footer">Serve Kuwait is free for workers. Never pay anyone to get a job.</p>
+  <details><summary data-i18n="rulesTitle">Rules and privacy</summary><ul id="rules"></ul></details>
+</div></footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
