@@ -1,8 +1,8 @@
-// Serve Kuwait — one page per ad at /a/<id>.
+// Serve Kuwait — one page per ad at /a/<id> (Cloudflare Pages Function).
+// Not cached at the edge, so a removed ad disappears at once.
 // - Gives every ad its own link with a proper WhatsApp/social preview.
 // - Job openings carry JobPosting data so Google can show them in job search.
 // - Worker ads ("looking for work") are noindex: people's phone numbers stay out of search engines.
-import type { Config } from "@netlify/edge-functions";
 
 const SUPABASE_URL = "https://fakbryjjjoyfyhierkhf.supabase.co";
 const SUPABASE_KEY = "sb_publishable_15V0U11Wi6YvFgdq59-a7A__Ub7fHPo"; // public key; access is limited by database rules
@@ -47,7 +47,7 @@ ${opts.index ? "" : '<meta name="robots" content="noindex">'}<link rel="canonica
 <p class="trust">Serve Kuwait is free for workers. Never pay anyone to get a job.</p></main></body></html>`;
   return new Response(html, {
     status: opts.status ?? 200,
-    headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=0, must-revalidate", "netlify-cdn-cache-control": "public, s-maxage=60" }
+    headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=0, must-revalidate" }
   });
 }
 
@@ -56,8 +56,8 @@ function gone() {
     body: `<div class="card"><h1>This ad is no longer available</h1><p class="meta">It was removed or has expired.</p><a class="btn all" href="/">See all jobs and workers</a></div>` });
 }
 
-export default async (req: Request, context: { params?: Record<string, string> }) => {
-  const id = context.params?.id ?? new URL(req.url).pathname.split("/").pop() ?? "";
+export const onRequestGet = async ({ params }: { params: Record<string, string | string[]> }) => {
+  const id = String(params.id ?? "");
   if (!/^[0-9a-f-]{36}$/i.test(id)) return gone();
 
   const cols = "id,created_at,expires_at,kind,category,job_title,area,salary,benefits,can_transfer,residency_title,description,poster_name,whatsapp,age";
@@ -108,4 +108,3 @@ ${!hiring && a.can_transfer ? `<span class="tag">${esc(XFER[a.can_transfer] ?? "
   return page({ title, desc, url, index: hiring, body, jsonld });
 };
 
-export const config: Config = { path: "/a/:id", cache: "manual" };
