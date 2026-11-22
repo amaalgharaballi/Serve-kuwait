@@ -10,7 +10,7 @@ Two sides: **I'm looking for a job** (job openings from businesses) and **I'm lo
 |---|---|---|
 | Site | `public/` | Plain HTML/CSS/JS modules. No build step, no framework. |
 | Per-ad pages and sitemap | `netlify/edge-functions/` | `/a/<id>` renders one ad (Google JobPosting data for job openings); `/sitemap.xml` |
-| Hosting | Netlify | Every merge to `main` deploys to servekuwait.com. Every pull request gets a preview link. |
+| Hosting | Netlify (free plan) | Every merge to `main` deploys to servekuwait.com. Every pull request gets a preview link. |
 | Database | Supabase (project ref `fakbryjjjoyfyhierkhf`) | Postgres with row-level security. Full setup in `supabase/schema.sql`. |
 | WhatsApp verification | `supabase/functions/whatsapp-webhook/` | Deployed in Supabase. Switched off until the business number is connected. |
 
@@ -46,4 +46,4 @@ For demo mode with sample ads and no database, empty `SUPABASE_URL` and `SUPABAS
 
 ## Deploys
 
-Netlify (linked to this repo) deploys `main` to servekuwait.com and posts a preview link on every pull request. GitHub Actions (`.github/workflows/deploy.yml`) also deploys `main` and posts the result to Slack #deploys. It needs one repository secret, `NETLIFY_AUTH_TOKEN` (currently saved as `NETIFLY`, which also works) (a Netlify personal access token); without it the workflow skips the deploy.
+Netlify is linked to this repo: every merge to `main` goes live on servekuwait.com, and every pull request gets a preview link posted on it. Deploy messages go to Slack #deploys from Netlify (Project configuration → Notifications). Each production deploy uses 15 of the free plan's 300 monthly Netlify credits, so batch small changes into one pull request.
