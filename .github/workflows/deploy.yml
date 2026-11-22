@@ -18,7 +18,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN || secrets.NETIFLY }}
       NETLIFY_SITE_ID: 5da4e14d-210d-4b2c-b91c-df484e7abf2c
     steps:
       - name: Check the Netlify key is set

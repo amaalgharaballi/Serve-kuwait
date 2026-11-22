@@ -46,4 +46,4 @@ For demo mode with sample ads and no database, empty `SUPABASE_URL` and `SUPABAS
 
 ## Deploys
 
-GitHub Actions (`.github/workflows/deploy.yml`) deploys `main` to servekuwait.com and posts a preview link on every pull request. It needs one repository secret, `NETLIFY_AUTH_TOKEN` (a Netlify personal access token); without it the workflow skips the deploy.
+GitHub Actions (`.github/workflows/deploy.yml`) deploys `main` to servekuwait.com and posts a preview link on every pull request. It needs one repository secret, `NETLIFY_AUTH_TOKEN` (currently saved as `NETIFLY`, which also works) (a Netlify personal access token); without it the workflow skips the deploy.
