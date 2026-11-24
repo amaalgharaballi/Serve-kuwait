@@ -217,9 +217,30 @@ function renderForm() {
 function show(view) {
   $("browse").hidden = view !== "browse"; $("post").hidden = view !== "post"; $("hero").hidden = view !== "browse";
   stopPolling();
-  if (view === "post") { renderForm(); $("form").hidden = false; $("done").hidden = true; $("verify").hidden = true; $("err").textContent = ""; }
+  if (view === "post") { renderForm(); $("form").hidden = false; $("done").hidden = true; $("verify").hidden = true; clearFieldErrors(); }
   note("");
   window.scrollTo(0, 0);
+}
+
+// Form errors: name the field, highlight it, and scroll to it (the message also shows above Publish).
+function fieldBox(el) {
+  if (!el) return null;
+  if (el.id === "transferRadios" || el.id === "checksHiring" || el.id === "checksSeeking") return el.closest("fieldset") || el;
+  return el.closest("label");
+}
+function clearFieldErrors() {
+  $("err").textContent = "";
+  document.querySelectorAll("#form .bad").forEach(x => x.classList.remove("bad"));
+  document.querySelectorAll("#form .ferr").forEach(x => x.remove());
+}
+function showFieldError(key, el) {
+  const msg = t(key), box = fieldBox(el);
+  $("err").textContent = msg;
+  if (!box) return;
+  box.classList.add("bad");
+  const p = document.createElement("p"); p.className = "ferr"; p.textContent = msg; box.after(p);
+  box.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  if (el.focus && el.tagName !== "DIV") el.focus({ preventScroll: true });
 }
 
 async function submit(e) {
@@ -237,16 +258,24 @@ async function submit(e) {
     whatsapp: (f.get("whatsapp") || "").replace(/\D/g, "").replace(/^965(?=\d{8}$)/, ""),
     age: h ? null : parseInt(f.get("age"), 10)
   };
-  const jobOk = ad.category === "other" ? ad.job_title.length >= 2 : titlesOf(ad.category).includes(ad.job_title);
-  if (ad.category === "other" && OUT_OF_SCOPE.test(ad.job_title)) return (err.textContent = t("eScope"));
-  if (ad.category === "other" && /\d{4,}/.test(ad.job_title)) return (err.textContent = t("eId"));
-  if (!ad.category || !jobOk || !ad.area || ad.description.length < 10 || ad.poster_name.length < 2) return (err.textContent = t("eMissing"));
-  if (!h && !TRANSFER.includes(ad.can_transfer)) return (err.textContent = t("eTransfer"));
-  if (/\d{4,}/.test(ad.residency_title || "") || /\d{12}/.test(ad.description)) return (err.textContent = t("eId"));
-  if (!h && !(ad.age >= 18 && ad.age <= 75)) return (err.textContent = t("eAge"));
-  if (!/^[4569]\d{7}$/.test(ad.whatsapp)) return (err.textContent = t("ePhone"));
-  if (h ? !(f.get("isBusiness") && f.get("noFees")) : !f.get("inKuwait")) return (err.textContent = t("eChecks"));
-  if (FEE_PATTERN.test(ad.description)) return (err.textContent = t("eFees"));
+  const F = e.target, fail = (key, name) => showFieldError(key, typeof name === "string" ? F.elements[name] : name);
+  clearFieldErrors();
+  if (!ad.category) return fail("eCategory", "category");
+  if (ad.category === "other") {
+    if (ad.job_title.length < 2) return fail("eJobOther", "job_other");
+    if (OUT_OF_SCOPE.test(ad.job_title)) return fail("eScope", "job_other");
+    if (/\d{4,}/.test(ad.job_title)) return fail("eId", "job_other");
+  } else if (!titlesOf(ad.category).includes(ad.job_title)) return fail("eJob", "job_title");
+  if (!h && !TRANSFER.includes(ad.can_transfer)) return fail("eTransfer", $("transferRadios"));
+  if (/\d{4,}/.test(ad.residency_title || "")) return fail("eId", "residency_title");
+  if (!ad.area) return fail("eArea", "area");
+  if (ad.description.length < 10) return fail("eDetails", "description");
+  if (/\d{12}/.test(ad.description)) return fail("eId", "description");
+  if (FEE_PATTERN.test(ad.description)) return fail("eFees", "description");
+  if (ad.poster_name.length < 2) return fail("eName", "poster_name");
+  if (!h && !(ad.age >= 18 && ad.age <= 75)) return fail("eAge", "age");
+  if (!/^[4569]\d{7}$/.test(ad.whatsapp)) return fail("ePhone", "whatsapp");
+  if (h ? !(f.get("isBusiness") && f.get("noFees")) : !f.get("inKuwait")) return fail("eChecks", $(h ? "checksHiring" : "checksSeeking"));
   const btn = $("submitBtn"); btn.disabled = true;
   const id = uuid(), token = uuid(), code = String(crypto.getRandomValues(new Uint32Array(1))[0] % 1000000).padStart(6, "0");
   let status = "live";
@@ -345,6 +374,11 @@ $("list").addEventListener("click", e => {
   state.open = String(state.open) === id ? null : state.ads.find(a => String(a.id) === id)?.id ?? null;
   try { history.replaceState(null, "", state.open ? "#ad-" + state.open : location.pathname + location.search); } catch {}
   render();
+});
+$("form").addEventListener("input", e => {
+  const box = e.target.closest(".bad"); if (!box) return;
+  box.classList.remove("bad"); if (box.nextElementSibling?.classList.contains("ferr")) box.nextElementSibling.remove();
+  if (!document.querySelector("#form .bad")) $("err").textContent = "";
 });
 $("postBtn").addEventListener("click", () => show("post"));
 $("cancel").addEventListener("click", () => show("browse"));
