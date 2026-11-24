@@ -117,6 +117,10 @@ legend{font-weight:500;font-size:15px;padding:0;margin-bottom:6px}
 .ben{font-size:13px;line-height:16px;color:var(--ink-muted);white-space:nowrap}
 .ben-line{display:none}
 .err{color:var(--danger);font-weight:600;min-height:1.5em;margin:0}
+.ferr{color:var(--danger);font-weight:600;font-size:14px;line-height:20px;margin:-4px 0 0}
+.bad input,.bad select,.bad textarea{border-color:var(--danger);box-shadow:0 0 0 1px var(--danger)}
+.bad.check input,#checksHiring.bad .check input,#checksSeeking.bad .check input{outline:2px solid var(--danger);outline-offset:2px}
+.radios.bad label{border-color:var(--danger)}
 .ok{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);padding:var(--space-6);margin:var(--space-6) auto var(--space-10);max-width:600px}
 .keep .acts>*{flex:1 1 auto}
 .cap{text-transform:capitalize}
